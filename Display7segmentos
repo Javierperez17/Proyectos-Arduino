@@ -1,0 +1,38 @@
+#include <stdlib.h>
+
+int segmentPins[] = {2, 3, 4, 5, 6, 7, 8}; // Pines para los segmentos del display
+int numbers[7][7] = { // Números 0-6
+  {1, 1, 1, 1, 1, 1, 0}, // 0
+  {0, 1, 1, 0, 0, 0, 0}, // 1
+  {1, 1, 0, 1, 1, 0, 1}, // 2
+  {1, 1, 1, 1, 0, 0, 1}, // 3
+  {0, 1, 1, 0, 0, 1, 1}, // 4
+  {1, 0, 1, 1, 0, 1, 1}, // 5
+  {1, 0, 1, 1, 1, 1, 1}  // 6
+};
+int joystickButton = 9; // Botón del joystick en pin 9
+
+void setup() {
+  for (int i = 0; i < 7; i++) { // Configura segmentos como salidas
+    pinMode(segmentPins[i], OUTPUT);
+  }
+  pinMode(joystickButton, INPUT_PULLUP); // Botón como entrada con resistencia pull-up interna
+  randomSeed(analogRead(0)); // Semilla aleatoria basada en una lectura analógica
+  Serial.begin(9600); // Inicia comunicación serial a 9600 baudios
+}
+
+void loop() {
+  if (digitalRead(joystickButton) == LOW) { // Si se presiona el botón del joystick
+    int randomNumber = random(0, 7); // Genera un número aleatorio del 0 al 6
+    displayNumber(randomNumber); // Muestra el número aleatorio en el display
+    Serial.println(randomNumber); // Imprime el número aleatorio en el Monitor Serial
+    delay(200); // Espera un poco para evitar rebotes
+    while (digitalRead(joystickButton) == LOW); // Espera hasta que se suelte el botón
+  }
+}
+
+void displayNumber(int num) { // Muestra el número en el display de 7 segmentos
+  for (int segment = 0; segment < 7; segment++) {
+    digitalWrite(segmentPins[segment], numbers[num][segment]); // Enciende o apaga los segmentos según el patrón del número
+  }
+}
